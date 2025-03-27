@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tiendas",
+  "info": {
+    "singularName": "tienda",
+    "pluralName": "tiendas",
+    "displayName": "Tienda"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Nombre": {
+      "type": "string",
+      "required": true
+    },
+    "Direccion": {
+      "type": "string",
+      "required": true
+    },
+    "Telefono": {
+      "type": "string",
+      "required": true,
+      "maxLength": 20
+    },
+    "Email": {
+      "type": "email",
+      "required": true
+    },
+    "vendedores": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::vendedore.vendedore",
+      "mappedBy": "tienda"
+    }
+  }
+}

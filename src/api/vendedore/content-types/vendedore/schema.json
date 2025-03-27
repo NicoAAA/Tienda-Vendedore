@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vendedores",
+  "info": {
+    "singularName": "vendedore",
+    "pluralName": "vendedores",
+    "displayName": "Vendedore"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "Nombre": {
+      "type": "string",
+      "required": true
+    },
+    "Apellido": {
+      "type": "string",
+      "required": true
+    },
+    "Fecha_contratacion": {
+      "type": "date"
+    },
+    "tienda": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tienda.tienda"
+    }
+  }
+}
