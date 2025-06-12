@@ -24,7 +24,8 @@
     "tienda": {
       "type": "relation",
       "relation": "manyToOne",
-      "target": "api::tienda.tienda"
+      "target": "api::tienda.tienda",
+      "inversedBy": "vendedores"
     }
   }
 }

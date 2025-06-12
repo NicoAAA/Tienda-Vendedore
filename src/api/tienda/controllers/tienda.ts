@@ -4,38 +4,14 @@
 
 import { factories } from '@strapi/strapi';
 import axios from 'axios';
+import database from '../../../../config/database';
 
 /* 
     Funcion que obtiene los vendedores de una tienda
     @param ctx: Contexto de la petición
     @param documentId: Identificador de la tienda
 */
-const functionGetVendedoresByTienda = async (ctx, documentId) => {
-    try {
-      const token = ctx.request.headers.authorization?.split(" ")[1];
-      const response = await axios.get(
-        'http://localhost:1337/api/vendedores',
-        {
-          params: {
-            'filters[tienda][documentId][$eq]': documentId,
-            populate: '*'
-          },
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-      ctx.body = response.data;
-    } catch (error) {
-      // Imprime información del error para depurar
-      console.error("Error en functionGetVendedoresByTienda:", error.message);
-      if (error.response) {
-        console.error("Datos del error:", error.response.data);
-      }
-      ctx.throw(500, `ERROR: No se pudo obtener los vendedores de la tienda - ${error.message}`);
-    }
-  };
+
 
 
   const functionListTiendasWithCount = async (ctx) => {
@@ -99,21 +75,71 @@ Export the controller: Sirve para extender la funcionalidad de un controlador ex
 en este caso el controlador de la entidad tienda y se añaden dos nuevos métodos
 endedoresByTienda y listTiendasWithCount.
 */
-export default factories.createCoreController('api::tienda.tienda',({ strapi }) => ({
-    // Funcion que obtiene los vendedores de una tienda
-    async vendedoresByTienda(ctx) {
-        console.log("EndPoint /api/tiendas/:documentId/vendedores");
-        const token = ctx.request.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return ctx.unauthorized("No se ha enviado un token de autorización");
+
+export default factories.createCoreController('api::tienda.tienda', ({ strapi }) => ({
+  async search(ctx) {
+    const { filters, populate } = ctx.request.body;
+    try {
+      const results = await strapi.db.query('api::tienda.tienda').findMany({
+        where: filters,
+        populate: populate,
+      });
+      ctx.body = { data: results };
+    } catch (error) {
+      console.error("Error en la búsqueda:", error);
+      ctx.throw(500, "Error en la búsqueda");
+    }
+  },
+  async vendedoresByTienda(ctx) {
+    // Validar token
+    const token = ctx.request.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return ctx.unauthorized("No se ha enviado un token de autorización");
+    }
+    // Extraer documentId del body de la petición
+    const { data: { documentId } = { documentId: null } } = ctx.request.body;
+    if (!documentId) {
+      return ctx.throw(400, "ERROR: El documentId de la tienda es requerido en el body");
+    }
+
+    try {
+      // Realiza una consulta POST a un endpoint custom que realice la búsqueda.
+      // Este endpoint debe estar configurado en las rutas para aceptar POST.
+      const response = await axios.post(
+        'http://localhost:1337/api/tiendas/search',
+        {
+          filters: { documentId: { $eq: documentId } },
+          populate: 'vendedores'
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-        const { documentId } = ctx.params;
-        try{
-            await functionGetVendedoresByTienda(ctx,documentId);
-        } catch (error) {
-            ctx.throw(500, "ERROR: No se pudo obtener los vendedores de la tienda");
-        }
-    },
+      );
+
+      console.log("Respuesta de axios:", JSON.stringify(response.data, null, 2));
+
+      if (!response.data.data || response.data.data.length === 0) {
+        return ctx.throw(400, "ERROR: No se encontró la tienda con el documentId proporcionado");
+      }
+
+      const tienda = response.data.data[0];
+      const vendedores = tienda.attributes.vendedores && tienda.attributes.vendedores.data
+        ? tienda.attributes.vendedores.data
+        : [];
+
+      ctx.body = {
+        message: 'Lista de vendedores que trabajan en la tienda ' + tienda.attributes.Nombre,
+        vendedores: vendedores
+      };
+    } catch (error) {
+      console.error("Error en la consulta con axios:", error.response?.data || error.message);
+      return ctx.throw(500, "Error en la consulta");
+    }
+  },
+
     
 
     async listTiendasWithCount(ctx) {
