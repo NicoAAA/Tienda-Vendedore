@@ -372,6 +372,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiTiendaTienda extends Struct.CollectionTypeSchema {
   collectionName: 'tiendas';
   info: {
+    description: '';
     displayName: 'Tienda';
     pluralName: 'tiendas';
     singularName: 'tienda';
@@ -411,6 +412,7 @@ export interface ApiTiendaTienda extends Struct.CollectionTypeSchema {
 export interface ApiVendedoreVendedore extends Struct.CollectionTypeSchema {
   collectionName: 'vendedores';
   info: {
+    description: '';
     displayName: 'Vendedore';
     pluralName: 'vendedores';
     singularName: 'vendedore';
@@ -430,9 +432,11 @@ export interface ApiVendedoreVendedore extends Struct.CollectionTypeSchema {
       'api::vendedore.vendedore'
     > &
       Schema.Attribute.Private;
+    n_Documento: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     Nombre: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
-    tienda: Schema.Attribute.Relation<'manyToOne', 'api::tienda.tienda'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

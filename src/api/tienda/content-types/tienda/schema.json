@@ -4,7 +4,8 @@
   "info": {
     "singularName": "tienda",
     "pluralName": "tiendas",
-    "displayName": "Tienda"
+    "displayName": "Tienda",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -30,8 +31,7 @@
     "vendedores": {
       "type": "relation",
       "relation": "oneToMany",
-      "target": "api::vendedore.vendedore",
-      "mappedBy": "tienda"
+      "target": "api::vendedore.vendedore"
     }
   }
 }

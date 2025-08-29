@@ -4,7 +4,8 @@
   "info": {
     "singularName": "vendedore",
     "pluralName": "vendedores",
-    "displayName": "Vendedore"
+    "displayName": "Vendedore",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -21,11 +22,10 @@
     "Fecha_contratacion": {
       "type": "date"
     },
-    "tienda": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::tienda.tienda",
-      "inversedBy": "vendedores"
+    "n_Documento": {
+      "type": "string",
+      "required": true,
+      "unique": true
     }
   }
 }
